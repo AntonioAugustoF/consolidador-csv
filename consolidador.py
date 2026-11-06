@@ -5,9 +5,11 @@ import csv
 # variáveis globais
 PASTA = os.path.dirname(os.path.abspath(__file__))
 PASTA_RELATORIOS = os.path.join(PASTA, "relatorios_mensais")
-
+PASTA_CONSOLIDADOS = os.path.join(PASTA, "consolidados")
 # garantindo a existência da pasta de entrada
 os.makedirs(PASTA_RELATORIOS, exist_ok=True)
+# pasta saída
+os.makedirs(PASTA_CONSOLIDADOS)
 
 total_p_categoria = {}
 total_p_mes = {}
@@ -31,6 +33,15 @@ for a in arquivos:
                     print(f"Não foi possível converter para float o item: '{linha.get("valor")}' da coluna 'valor'.")
                     continue
 
-print(f"Total por Mês: R$ {total_p_mes}")
-print(f"Total por Categoria: R$ {total_p_categoria}")
-print(f"Total Geral: R$ {total_geral}")
+
+def resumo_consolidado():
+    with open(os.path.join(PASTA_CONSOLIDADOS, "resumo_consolidado.txt"), "w", encoding="utf-8") as r:
+        r.write("Total por Mês\n")
+        for mes, valor_mes in total_p_mes.items():
+            r.write(f"{mes.capitalize():<12}: R$ {valor_mes:>8.2f}\n")
+        r.write("\nTotal por Categoria\n")
+        for categoria, valor_categoria in total_p_categoria.items():
+            r.write(f"{categoria:<12}: R$ {valor_categoria:>8.2f}\n")
+        r.write(f"\nTotal Geral : R$ {total_geral:>8.2f}")
+
+resumo_consolidado()
