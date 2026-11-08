@@ -9,8 +9,9 @@ PASTA_CONSOLIDADOS = os.path.join(PASTA, "consolidados")
 # garantindo a existência da pasta de entrada
 os.makedirs(PASTA_RELATORIOS, exist_ok=True)
 # pasta saída
-os.makedirs(PASTA_CONSOLIDADOS)
+os.makedirs(PASTA_CONSOLIDADOS, exist_ok=True)
 
+linhas_consolidadas = [] # lista de dicionários
 total_p_categoria = {}
 total_p_mes = {}
 total_geral = 0
@@ -29,9 +30,18 @@ for a in arquivos:
                     total_geral = total_geral + valor
                     total_p_categoria[categoria] = total_p_categoria.get(categoria, 0) + valor # itera pelo valor armazenado
                     total_p_mes[mes] = total_p_mes.get(mes, 0) + valor
+                    linha["mes"] = mes
+                    linhas_consolidadas.append(linha)
                 except ValueError:
                     print(f"Não foi possível converter para float o item: '{linha.get("valor")}' da coluna 'valor'.")
                     continue
+
+def relatorio_consolidado():
+    with open(os.path.join(PASTA_CONSOLIDADOS, "relatorio_consolidado.csv"), "w", encoding="utf-8") as r:
+        escritor = csv.DictWriter(r, fieldnames=["produto","categoria","valor","mes"])
+        escritor.writeheader()
+        escritor.writerows(linhas_consolidadas)
+        len(linhas_consolidadas)
 
 
 def resumo_consolidado():
@@ -45,3 +55,4 @@ def resumo_consolidado():
         r.write(f"\nTotal Geral : R$ {total_geral:>8.2f}")
 
 resumo_consolidado()
+relatorio_consolidado()
